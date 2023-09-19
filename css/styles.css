@@ -4,3 +4,13 @@
 .main{
 	margin: 2rem;
 }
+.vg-tooltip .key{
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis !important;
+  }
+.vg-tooltip .value {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
