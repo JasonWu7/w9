@@ -152,7 +152,8 @@
             "color": {
               "field": "num_patient_per_10k",
               "type": "quantitative",
-              "scale": { "type": "log" },
+              "scale": {  "type": "log",
+            "domain": [1, 10, 100, 1000, 10000, 100000], },
               "legend": { "title": "Number of patients per 10,000 population" }
             },
             "tooltip": [
