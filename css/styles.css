@@ -4,13 +4,28 @@
 .main{
 	margin: 2rem;
 }
-.vg-tooltip .key{
+
+.vg-tooltip {
 	white-space: nowrap;
 	overflow: hidden;
-	text-overflow: ellipsis !important;
+	text-overflow: ellipsis;
   }
-.vg-tooltip .value {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+  
+  .vg-tooltip .key {
+	color: black !important;
+	display: inline;
+	white-space: normal;
+	overflow: visible;
+	text-overflow: initial;
+	max-width: none;
+  }
+  
+  .vg-tooltip .value {
+	font-weight:bold;
+	display: inline;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-size: 14px;
+	color: #1961aa;
+  }
