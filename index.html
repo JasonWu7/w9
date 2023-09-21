@@ -22,82 +22,14 @@
 
     <div class="row">
       <div class="col">
-        <hr>
-        <Strong>Select Category Below</Strong>
-        <hr>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="categoryRadio" id="Schizophrenia (%)" checked>
-          <label class="form-check-label" for="flexRadioDefault1">
-            Schizophrenia
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="categoryRadio" id="Bipolar disorder (%)">
-          <label class="form-check-label" for="flexRadioDefault2">
-            Bipolar disorder
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="categoryRadio" id="Eating disorders (%)">
-          <label class="form-check-label" for="flexRadioDefault2">
-            Eating disorders
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="categoryRadio" id="Anxiety disorders (%)">
-          <label class="form-check-label" for="flexRadioDefault2">
-            Anxiety disorders
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="categoryRadio" id="Drug use disorders (%)">
-          <label class="form-check-label" for="flexRadioDefault2">
-            Drug use disorders
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="categoryRadio" id="Depression (%)">
-          <label class="form-check-label" for="flexRadioDefault2">
-            Depression
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="categoryRadio" id="Alcohol use disorders (%)">
-          <label class="form-check-label" for="flexRadioDefault2">
-            Alcohol use disorders
-          </label>
-        </div>
-        <hr>
       </div>
       <div class="col-8" id="choropleth_map">
       </div>
       <div class="col">
-        <div class="dropdown">
-          <button class="btn btn-secondary dropdown-toggle" type="button" id="yearDropdown" data-bs-toggle="dropdown"
-            aria-expanded="false">
-            Choose Year
-          </button>
-
-          <ul class="dropdown-menu" aria-labelledby="yearDropdown">
-            <li><a class="dropdown-item" href="#" data-year="2007">2007</a></li>
-            <li><a class="dropdown-item" href="#" data-year="2008">2008</a></li>
-            <li><a class="dropdown-item" href="#" data-year="2009">2009</a></li>
-            <li><a class="dropdown-item" href="#" data-year="2010">2010</a></li>
-            <li><a class="dropdown-item" href="#" data-year="2011">2011</a></li>
-            <li><a class="dropdown-item" href="#" data-year="2012">2012</a></li>
-            <li><a class="dropdown-item" href="#" data-year="2013">2013</a></li>
-            <li><a class="dropdown-item" href="#" data-year="2014">2014</a></li>
-            <li><a class="dropdown-item" href="#" data-year="2015">2015</a></li>
-            <li><a class="dropdown-item" href="#" data-year="2016">2016</a></li>
-            <li><a class="dropdown-item" href="#" data-year="2017">2017</a></li>
-          </ul>
-        </div>
       </div>
     </div>
 
   </div>
-
-
 
   <div id="choropleth_map"></div>
 
@@ -105,14 +37,51 @@
 
     var spec = {
       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-      "title": "Statistics on the Number of Patients with Different Types of Mental Health Disorders",
+      "title": {
+      "text": {
+      "signal": " 'Statistics on the Number of Patients with ' + replace(select_category, ' (%)', '') + ' (Year: ' + select_year + ')' "
+    },
+    "subtitle": ""
+  },
       "width": 800,
       "height": 400,
-      "projection": { "type": "equirectangular" },
+      "projection": { "type": "naturalEarth1" },
       "data": {
         "url": "https://raw.githubusercontent.com/JasonWu7/w9/main/data/ne_110m_countries.topojson",
         "format": { "type": "topojson", "feature": "ne_110m_admin_0_countries" }
       },
+      "params":[
+            {
+                "name": "select_year", "value": 2017,
+                "bind": {"input": "range", "min": 1990, "max": 2017, "step": 1, "name": "Select Year: "},
+            },
+            {
+                "name": "select_category", 
+                "value": "Schizophrenia (%)",
+                "bind": {
+                    "input": "select",
+                    "options": [
+                        "Schizophrenia (%)",
+                        "Bipolar disorder (%)",
+                        "Eating disorders (%)",
+                        "Anxiety disorders (%)",
+                        "Drug use disorders (%)",
+                        "Depression (%)",
+                        "Alcohol use disorders (%)",
+                    ],
+                    "labels":[
+                    "Schizophrenia",
+                    "Bipolar disorder",
+                    "Eating disorders",
+                    "Anxiety disorders",
+                    "Drug use disorders",
+                    "Depression",
+                    "Alcohol use disorders",
+                    ],
+                    "name": "Select Category: "
+                }
+            },
+          ],
       "layer": [
         {
           "transform": [
@@ -128,6 +97,7 @@
           "data": {
             "url": "https://raw.githubusercontent.com/JasonWu7/w9/main/data/combined_dataset_1_2.csv",
           },
+          
           "transform": [
             {
               "lookup": "Code",
@@ -140,9 +110,9 @@
               },
               "as": "geo"
             },
-            { "filter": { "field": "Year", "equal": "2017" } },
+            { "filter":  "datum.Year == select_year"  },
             {
-              "calculate": "datum['Schizophrenia (%)'] * datum['Population'] / 10000",
+              "calculate": "datum[select_category] * datum['Population'] / 10000",
               "as": "num_patient_per_10k"
             }
           ],
@@ -152,8 +122,10 @@
             "color": {
               "field": "num_patient_per_10k",
               "type": "quantitative",
-              "scale": {  "type": "log",
-            "domain": [1, 10, 100, 1000, 10000, 100000], },
+              "scale": {
+                "type": "log",
+                "domain": [1, 10, 100, 1000, 10000, 100000],
+              },
               "legend": { "title": "Number of patients per 10,000 population", "titleLimit": "250" }
             },
             "tooltip": [
@@ -179,50 +151,10 @@
       ],
     };
 
-    var selectedYear = "2017"; // Set the initial year
-
-    function setChartTitle(category, year) {
-      var categoryNameWithoutUnit = category.replace(" (%)", "");
-      spec.title = `Statistics on the Number of Patients with ${categoryNameWithoutUnit} (Year: ${year})`;
-    }
-
-    function updateMap(year) {
-      spec.layer[1].transform[1].filter.equal = year.toString();
-      setChartTitle(document.querySelector('input[name="categoryRadio"]:checked').id, year);
-
-      vegaEmbed('#choropleth_map', spec).then(function (result) {
-      }).catch(console.error);
-    }
-
-    // Add event listeners to the dropdown menu items
-    document.querySelectorAll('.dropdown-item').forEach(function (item) {
-      item.addEventListener('click', function () {
-        selectedYear = item.getAttribute('data-year');
-        updateMap(selectedYear);
-      });
-    });
-
-    function updateMapCategory(category) {
-      // Update the spec to use the selected category field
-      spec.layer[1].transform[2].calculate = `datum['${category}'] * datum['Population'] / 10000`;
-      setChartTitle(category, selectedYear);
-
       // Embed the updated spec into the #choropleth_map element
       vegaEmbed('#choropleth_map', spec).then(function (result) {
       }).catch(console.error);
-    }
-
-    // Add event listeners to the radio buttons
-    document.querySelectorAll('input[name="categoryRadio"]').forEach(function (radio) {
-      radio.addEventListener('change', function () {
-        var selectedCategory = radio.id; // Get the ID of the selected radio button
-        updateMapCategory(selectedCategory);
-      });
-    });
-
-    // Initial map rendering
-    updateMap(selectedYear);
-    updateMapCategory("Schizophrenia (%)");
+   
   </script>
 
 </body>
